@@ -5,6 +5,8 @@ A data platform that turns education GenAI pilot operations into measurable metr
 ## What's in this repo
 
 - `probe/`: Windows agent that measures active use
-- server ingest / warehouse: not built yet
+- `probe/`: Windows agent (active-use minutes per hour)
+- `ingest/`: HTTP API that writes probe events into Postgres
+- daily / mart tables: not built yet
 
-Contract: `docs/device-event-contract.md`
+See `docs/device-event-contract.md`.

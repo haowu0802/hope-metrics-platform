@@ -1,0 +1,38 @@
+# ingest
+
+Accepts one hour-usage JSON body and inserts a row into `raw_device_usage_hour`.
+
+## Setup
+
+1. Repo-root `.env` (gitignored):
+
+```text
+DATABASE_URL=postgresql://USER:PASSWORD@127.0.0.1:5432/hope_metrics
+```
+
+2. Create the table:
+
+```bat
+psql %DATABASE_URL% -f ingest/schema.sql
+```
+
+3. From `ingest/`:
+
+```bat
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app:app --host 127.0.0.1 --port 8080
+```
+
+## Try it
+
+```bat
+curl -s -X POST http://127.0.0.1:8080/v1/events -H "Content-Type: application/json" -d "{\"schema_version\":\"1\",\"probe_version\":\"0.1.0\",\"device_id\":\"test-device\",\"window_start\":\"2026-07-27T14:00:00-04:00\",\"window_end\":\"2026-07-27T15:00:00-04:00\",\"active_minutes\":12}"
+```
+
+Probe:
+
+```bat
+hope-probe.exe --out-dir .\out --ingest-url http://127.0.0.1:8080/v1/events
+```

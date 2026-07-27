@@ -38,7 +38,9 @@ Example:
 ## How events leave the machine
 
 1. Write each closed hour to a JSON file under the local `pending` directory.
-2. If `ingest-url` is set, POST those files.
+2. If `ingest-url` is set, POST them to `/v1/events`.
 3. After HTTP 2xx, delete the local file.
+
+Rows land in Postgres `raw_device_usage_hour` (append only).
 
 `--debug` only adds console logs; same write/upload behavior.
