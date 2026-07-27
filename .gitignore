@@ -24,3 +24,12 @@ Thumbs.db
 
 # Data / local artifacts
 data/
+probe/out/
+probe/_test_out/
+probe/*.exe
+probe/_test_out_run.log
+probe/_test_out_run.err
+probe/_test_guid.log
+probe/_test_guid.err
+probe/*.log
+probe/*.err
