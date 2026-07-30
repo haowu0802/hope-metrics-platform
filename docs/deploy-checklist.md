@@ -8,13 +8,24 @@ Do not commit secrets. Put `DATABASE_URL` in platform secrets / local `.env` onl
 2. App from `ingest/` (`Dockerfile`, `fly.toml`) - `POST /v1/events`, `GET /`, `GET /health`
 3. Optional custom domain later
 
-## First deploy
+## First deploy / update
+
+From `ingest/`:
+
+```powershell
+.\deploy.ps1
+```
+
+Or:
 
 ```text
-# in ingest/
-# set DATABASE_URL as a secret on the host
-# fly deploy   (or your host's equivalent)
+fly deploy --ha=false
+fly scale count 1 -y
 ```
+
+(`--ha=false` avoids a second standby machine; not configurable in fly.toml.)
+
+Set `DATABASE_URL` as a platform secret before the first deploy.
 
 Check:
 

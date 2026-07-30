@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hope Metrics</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 1.5rem; color: #222; }
+    h1 { font-size: 1.25rem; margin: 0 0 0.5rem; }
+    .notes { color: #555; font-size: 0.9rem; margin: 0 0 1.25rem; line-height: 1.4; }
+    .meta { color: #666; font-size: 0.85rem; margin-bottom: 0.5rem; }
+    table { border-collapse: collapse; width: 100%; max-width: 52rem; }
+    th, td { border: 1px solid #ccc; padding: 0.4rem 0.6rem; text-align: left; }
+    th { background: #f3f3f3; font-weight: 600; }
+    td.num { font-variant-numeric: tabular-nums; }
+    .empty { color: #666; }
+    code { font-size: 0.9em; }
+  </style>
+</head>
+<body>
+  <h1>Hope Metrics</h1>
+  <div class="notes">
+    Active minutes = keyboard/mouse activity (idle cutoff 10 min).<br />
+    Pilot device telemetry — not beneficiary/impact microdata.
+  </div>
+
+  {% if row_count == 0 %}
+  <p class="empty">No rows. Send events to <code>POST /v1/events</code>.</p>
+  {% else %}
+  <p class="meta">{{ row_count }} row(s) from <code>mart_device_daily_usage</code> (US/Eastern date)</p>
+  <table>
+    <thead>
+      <tr>
+        <th>device_id</th>
+        <th>usage_date</th>
+        <th>active_minutes_day</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td><code>{{ r.device_id }}</code></td>
+        <td>{{ r.usage_date }}</td>
+        <td class="num">{{ r.active_minutes_day }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</body>
+</html>
