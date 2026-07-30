@@ -1,4 +1,4 @@
-"""POST /v1/events -> raw_device_usage_hour."""
+"""Ingest API and dashboard."""
 
 from __future__ import annotations
 
@@ -6,16 +6,19 @@ from pathlib import Path
 from typing import Any
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field, field_validator
 
-from db import insert_usage_hour
+from db import fetch_daily_usage, insert_usage_hour
 
 _root = Path(__file__).resolve().parent.parent
 load_dotenv(_root / ".env")
 load_dotenv(Path(__file__).resolve().parent / ".env")
 
 app = FastAPI(title="hope-metrics-ingest", version="0.1.0")
+templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent / "templates"))
 
 
 class UsageHourEvent(BaseModel):
@@ -39,10 +42,32 @@ def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
+@app.get("/", response_class=HTMLResponse)
+def dashboard(request: Request) -> HTMLResponse:
+    try:
+        rows = fetch_daily_usage()
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    return templates.TemplateResponse(
+        request,
+        "dashboard.html",
+        {"rows": rows, "row_count": len(rows)},
+    )
+
+
+@app.get("/api/v1/daily-usage")
+def api_daily_usage() -> dict[str, Any]:
+    try:
+        rows = fetch_daily_usage()
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    return {"rows": rows, "count": len(rows)}
+
+
 @app.post("/v1/events", status_code=201)
 def post_event(event: UsageHourEvent) -> dict[str, Any]:
     try:
         row_id = insert_usage_hour(event.model_dump())
-    except Exception as exc:  # local: surface DB errors in 500 body
+    except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
     return {"id": row_id, "status": "accepted"}

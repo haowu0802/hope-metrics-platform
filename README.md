@@ -1,13 +1,27 @@
 # Hope Metrics Platform
 
-A data platform that turns education GenAI pilot operations into measurable metrics.
+Measures donated-device active use for a GenAI education pilot.
 
-## What's in this repo
+## Repo layout
 
-- `probe/`: Windows agent that measures active use
-- `probe/`: Windows agent (active-use minutes per hour)
-- `ingest/`: HTTP API that writes probe events into Postgres
-- `warehouse/`: staging dedupe + daily usage views
+- `probe/` — Windows agent (active minutes per hour)
+- `ingest/` — HTTP ingest + simple dashboard
+- `warehouse/` — staging dedupe + daily usage views
 
-Contract: `docs/device-event-contract.md`  
-Grains: `docs/grains.md`
+See `docs/device-event-contract.md`, `docs/grains.md`, `docs/deploy-checklist.md`.
+
+## Run ingest + dashboard locally
+
+Needs `DATABASE_URL` in a repo-root `.env`, and schema/views applied (see `ingest/README.md`).
+
+```bat
+cd ingest
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app:app --host 127.0.0.1 --port 8080
+```
+
+Open http://127.0.0.1:8080/
+
+Public demo: https://hope-metrics.fly.dev/

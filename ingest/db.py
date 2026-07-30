@@ -1,4 +1,4 @@
-"""Postgres insert helpers."""
+"""Postgres access."""
 
 from __future__ import annotations
 
@@ -17,8 +17,28 @@ def database_url() -> str:
     return url
 
 
+def fetch_daily_usage(limit: int = 90) -> list[dict[str, Any]]:
+    sql = """
+        SELECT device_id, usage_date, active_minutes_day
+        FROM mart_device_daily_usage
+        ORDER BY usage_date DESC, device_id
+        LIMIT %(limit)s
+    """
+    with psycopg.connect(database_url()) as conn:
+        with conn.cursor() as cur:
+            cur.execute(sql, {"limit": limit})
+            rows = cur.fetchall()
+    return [
+        {
+            "device_id": r[0],
+            "usage_date": r[1].isoformat() if hasattr(r[1], "isoformat") else str(r[1]),
+            "active_minutes_day": int(r[2]),
+        }
+        for r in rows
+    ]
+
+
 def insert_usage_hour(event: dict[str, Any]) -> int:
-    """Insert one event. Returns new id."""
     window_start = _parse_ts(event["window_start"])
     window_end = _parse_ts(event["window_end"])
     active_minutes = int(event["active_minutes"])
@@ -63,6 +83,5 @@ def insert_usage_hour(event: dict[str, Any]) -> int:
 def _parse_ts(value: str | datetime) -> datetime:
     if isinstance(value, datetime):
         return value
-    # fromisoformat handles offset; Z → +00:00
     text = value.replace("Z", "+00:00")
     return datetime.fromisoformat(text)
