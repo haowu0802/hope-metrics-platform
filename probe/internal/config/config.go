@@ -7,7 +7,20 @@ import (
 	"strings"
 	"time"
 
+	_ "embed"
+
 	"github.com/haowu0802/hope-metrics-platform/probe/internal/deviceid"
+)
+
+//go:embed probe.build.env
+var embeddedBuildEnv string
+
+// Set via -ldflags from build.ps1 (optional; embed is enough if file is synced).
+var (
+	buildIngestURL string
+	buildOutDir    string
+	buildTimezone  string
+	buildIdleSec   string
 )
 
 const (
@@ -40,11 +53,39 @@ func FromFlagsAndEnv(debug bool, outDir, ingestURL, tz string, idleSeconds int) 
 		return Config{}, err
 	}
 
+	baked := parseBuildEnv(embeddedBuildEnv)
+	if buildIngestURL != "" {
+		baked["HOPE_INGEST_URL"] = buildIngestURL
+	}
+	if buildOutDir != "" {
+		baked["HOPE_OUT_DIR"] = buildOutDir
+	}
+	if buildTimezone != "" {
+		baked["HOPE_TZ"] = buildTimezone
+	}
+	if buildIdleSec != "" {
+		baked["HOPE_IDLE_SECONDS"] = buildIdleSec
+	}
+
 	cfg := Config{
-		DeviceID:      deviceID,
-		OutDir:        firstNonEmpty(outDir, os.Getenv("HOPE_OUT_DIR"), DefaultOutDir),
-		IngestURL:     firstNonEmpty(ingestURL, os.Getenv("HOPE_INGEST_URL")),
-		Timezone:      firstNonEmpty(tz, os.Getenv("HOPE_TZ"), "Local"),
+		DeviceID: deviceID,
+		OutDir: firstNonEmpty(
+			outDir,
+			os.Getenv("HOPE_OUT_DIR"),
+			baked["HOPE_OUT_DIR"],
+			DefaultOutDir,
+		),
+		IngestURL: firstNonEmpty(
+			ingestURL,
+			os.Getenv("HOPE_INGEST_URL"),
+			baked["HOPE_INGEST_URL"],
+		),
+		Timezone: firstNonEmpty(
+			tz,
+			os.Getenv("HOPE_TZ"),
+			baked["HOPE_TZ"],
+			"Local",
+		),
 		ProbeVersion:  firstNonEmpty(os.Getenv("HOPE_PROBE_VERSION"), DefaultProbeVersion),
 		SchemaVersion: DefaultSchemaVersion,
 		Debug:         debug,
@@ -60,6 +101,12 @@ func FromFlagsAndEnv(debug bool, outDir, ingestURL, tz string, idleSeconds int) 
 				return Config{}, fmt.Errorf("HOPE_IDLE_SECONDS: %w", err)
 			}
 			cfg.IdleSeconds = n
+		} else if v := baked["HOPE_IDLE_SECONDS"]; v != "" {
+			n, err := strconv.Atoi(v)
+			if err != nil {
+				return Config{}, fmt.Errorf("build HOPE_IDLE_SECONDS: %w", err)
+			}
+			cfg.IdleSeconds = n
 		} else {
 			cfg.IdleSeconds = DefaultIdleSeconds
 		}
@@ -71,6 +118,27 @@ func FromFlagsAndEnv(debug bool, outDir, ingestURL, tz string, idleSeconds int) 
 	}
 	cfg.Location = loc
 	return cfg, nil
+}
+
+func parseBuildEnv(raw string) map[string]string {
+	out := map[string]string{}
+	for _, line := range strings.Split(raw, "\n") {
+		line = strings.TrimSpace(line)
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		key, val, ok := strings.Cut(line, "=")
+		if !ok {
+			continue
+		}
+		key = strings.TrimSpace(key)
+		val = strings.TrimSpace(val)
+		val = strings.Trim(val, `"'`)
+		if key != "" {
+			out[key] = val
+		}
+	}
+	return out
 }
 
 func loadLocation(name string) (*time.Location, error) {

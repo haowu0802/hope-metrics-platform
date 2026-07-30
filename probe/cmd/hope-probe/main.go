@@ -20,7 +20,7 @@ import (
 func main() {
 	debug := flag.Bool("debug", false, "print detailed debug logs to the console")
 	outDir := flag.String("out-dir", "", "local output directory (or HOPE_OUT_DIR)")
-	ingestURL := flag.String("ingest-url", "", "ingest POST URL (or HOPE_INGEST_URL); empty keeps local only until set")
+	ingestURL := flag.String("ingest-url", "", "ingest POST URL (overrides env / build defaults)")
 	tz := flag.String("tz", "", "IANA timezone or Local (or HOPE_TZ)")
 	idleSeconds := flag.Int("idle-seconds", 0, "idle threshold seconds (default 600 / 10m)")
 	sampleEvery := flag.Duration("sample-every", time.Minute, "how often to sample last-input")
@@ -33,8 +33,8 @@ func main() {
 	}
 
 	log := logx.New(cfg.Debug)
-	log.Infof("hope-probe starting probe_version=%s schema_version=%s device_id=%s (MachineGuid) idle=%ds out_dir=%s ingest_url_set=%v debug=%v tz=%s",
-		cfg.ProbeVersion, cfg.SchemaVersion, cfg.DeviceID, cfg.IdleSeconds, cfg.OutDir, cfg.IngestURL != "", cfg.Debug, cfg.Timezone)
+	log.Infof("hope-probe starting probe_version=%s schema_version=%s device_id=%s (MachineGuid) idle=%ds out_dir=%s ingest_url=%s debug=%v tz=%s",
+		cfg.ProbeVersion, cfg.SchemaVersion, cfg.DeviceID, cfg.IdleSeconds, cfg.OutDir, cfg.IngestURL, cfg.Debug, cfg.Timezone)
 	log.Debugf("resolved location=%s upload_every=%s cleanup_every=%s",
 		cfg.Location.String(), cfg.UploadEvery, cfg.CleanupEvery)
 
