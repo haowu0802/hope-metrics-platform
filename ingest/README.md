@@ -1,7 +1,15 @@
 # ingest
 
 `POST /v1/events` appends to `raw_device_usage_hour`.  
-`GET /` shows `mart_device_daily_usage`. Health: `GET /health`.
+`GET /` shows `mart_device_daily_usage` with filters, daily trend, and device rank (UI: English default; `?lang=zh` for Chinese). Health: `GET /health`.
+
+Dashboard query params (shareable):
+
+```text
+/?lang=zh&date_from=2026-07-28&date_to=2026-07-30&device_id=demo-site-a&device_id=demo-site-b
+```
+
+JSON: `GET /api/v1/daily-usage` accepts the same `date_from` / `date_to` / `device_id` filters and returns `summary`, `trend`, `rank`, `rows`.
 
 ## Setup
 
