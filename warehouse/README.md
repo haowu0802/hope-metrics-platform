@@ -2,9 +2,9 @@
 
 Apply in order:
 
-```bat
-psql %DATABASE_URL% -f warehouse/stg_device_usage_hour.sql
-psql %DATABASE_URL% -f warehouse/mart_device_daily_usage.sql
+```bash
+psql "$DATABASE_URL" -f warehouse/stg_device_usage_hour.sql
+psql "$DATABASE_URL" -f warehouse/mart_device_daily_usage.sql
 ```
 
 | View | Role |

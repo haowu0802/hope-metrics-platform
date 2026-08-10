@@ -1,0 +1,6 @@
+# Local / CI artifacts — never commit
+target/
+dbt_packages/
+logs/
+.user.yml
+.venv/

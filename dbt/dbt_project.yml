@@ -1,0 +1,25 @@
+# Hope Metrics — dbt project (transforms)
+
+name: hope_metrics
+version: 1.0.0
+config-version: 2
+
+profile: hope_metrics
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:
+  - target
+  - dbt_packages
+
+models:
+  hope_metrics:
+    staging:
+      +materialized: view
+    marts:
+      +materialized: view

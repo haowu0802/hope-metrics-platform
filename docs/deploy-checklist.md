@@ -12,18 +12,14 @@ Do not commit secrets. Put `DATABASE_URL` in platform secrets / local `.env` onl
 
 From `ingest/`:
 
-```powershell
-.\deploy.ps1
-```
-
-Or:
-
-```text
+```bash
 fly deploy --ha=false
 fly scale count 1 -y
 ```
 
 (`--ha=false` avoids a second standby machine; not configurable in fly.toml.)
+
+There is also `deploy.ps1` for Windows hosts; the commands above are the source of truth.
 
 Set `DATABASE_URL` as a platform secret before the first deploy.
 

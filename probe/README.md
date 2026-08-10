@@ -2,6 +2,8 @@
 
 Counts active-use minutes per clock hour, writes local JSON, POSTs to ingest when a URL is set.
 
+This component **runs and builds on Windows only** (OS APIs). Platform docs elsewhere default to macOS/Linux shells.
+
 `device_id` = Windows `MachineGuid`. Contract: `../docs/device-event-contract.md`
 
 ## Build

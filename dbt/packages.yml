@@ -1,0 +1,2 @@
+# Third-party dbt packages (e.g. dbt_utils). Empty for MVP.
+packages: []
