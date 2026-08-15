@@ -1,4 +1,4 @@
--- Latest row per (device_id, window_start). raw stays append-only.
+-- Legacy reference only. Publish via dbt/models/staging/stg_device_usage_hour.sql
 
 CREATE OR REPLACE VIEW stg_device_usage_hour AS
 SELECT DISTINCT ON (device_id, window_start)

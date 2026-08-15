@@ -1,17 +1,8 @@
-# warehouse
+# warehouse (legacy)
 
-Apply in order:
+Publish path is [`dbt/`](../dbt/) (`dbt build`). SQL here is reference only.
 
-```bash
-psql "$DATABASE_URL" -f warehouse/stg_device_usage_hour.sql
-psql "$DATABASE_URL" -f warehouse/mart_device_daily_usage.sql
-```
-
-| View | Role |
+| Object | Grain |
 |---|---|
-| `stg_device_usage_hour` | Dedupe by `(device_id, window_start)` |
-| `mart_device_daily_usage` | Daily sum (US Eastern) |
-
-```sql
-SELECT * FROM mart_device_daily_usage ORDER BY usage_date, device_id;
-```
+| `stg_device_usage_hour` | One row per `(device_id, window_start)` |
+| `mart_device_daily_usage` | Device × US/Eastern day |

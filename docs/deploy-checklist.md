@@ -4,24 +4,31 @@ Do not commit secrets. Put `DATABASE_URL` in platform secrets / local `.env` onl
 
 ## Pieces
 
-1. Managed Postgres - same `ingest/schema.sql` + `warehouse/*.sql` as local
-2. App from `ingest/` (`Dockerfile`, `fly.toml`) - `POST /v1/events`, `GET /`, `GET /health`
+1. Managed Postgres — `ingest/schema.sql` for raw; stg/mart via `dbt build`
+2. App from `ingest/` (`Dockerfile`, `fly.toml`)
 3. Optional custom domain later
 
 ## First deploy / update
 
-From `ingest/`:
+**Transforms** (from a machine with `~/.dbt/profiles.yml` pointing at the same DB):
+
+```bash
+cd dbt
+source .venv/bin/activate
+dbt deps
+dbt build
+```
+
+**App** from `ingest/`:
 
 ```bash
 fly deploy --ha=false
 fly scale count 1 -y
 ```
 
-(`--ha=false` avoids a second standby machine; not configurable in fly.toml.)
+(`--ha=false` avoids a second standby machine.) Windows hosts may use `deploy.ps1`; commands above are the source of truth.
 
-There is also `deploy.ps1` for Windows hosts; the commands above are the source of truth.
-
-Set `DATABASE_URL` as a platform secret before the first deploy.
+Set `DATABASE_URL` as a platform secret before the first app deploy.
 
 Check:
 

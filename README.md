@@ -6,8 +6,8 @@ Measures donated-device active use for a GenAI education pilot.
 
 - `probe/` — Windows agent (active minutes per hour)
 - `ingest/` — HTTP ingest + simple dashboard
-- `warehouse/` — staging dedupe + daily usage views (legacy SQL; moving to `dbt/`)
-- `dbt/` — dbt transform project (models to follow)
+- `warehouse/` — legacy SQL (reference only)
+- `dbt/` — stg/mart transforms and tests
 
 See `docs/device-event-contract.md`, `docs/grains.md`, `docs/deploy-checklist.md`.
 

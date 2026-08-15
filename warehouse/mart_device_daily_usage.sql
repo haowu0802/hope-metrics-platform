@@ -1,4 +1,4 @@
--- device x Eastern date. From stg, not raw.
+-- Legacy reference only. Publish via dbt/models/marts/mart_device_daily_usage.sql
 
 CREATE OR REPLACE VIEW mart_device_daily_usage AS
 SELECT

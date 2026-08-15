@@ -1,5 +1,4 @@
--- One row per (device_id, window_start): latest ingest load wins.
--- Raw stays append-only; this view dedupes for marts.
+-- Latest row per (device_id, window_start).
 
 select distinct on (device_id, window_start)
     id,

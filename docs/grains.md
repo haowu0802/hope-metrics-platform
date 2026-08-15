@@ -1,5 +1,7 @@
 # Grains
 
+Published by [`dbt/`](../dbt/). `warehouse/` SQL is legacy reference only.
+
 ## `raw_device_usage_hour`
 
 One row = one probe report for one device time window.

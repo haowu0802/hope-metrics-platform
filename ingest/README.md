@@ -19,12 +19,15 @@ Repo-root `.env`:
 DATABASE_URL=postgresql://USER:PASSWORD@127.0.0.1:5432/hope_metrics
 ```
 
-Apply SQL:
+Schema + transforms (configure dbt first: see `dbt/README.md`):
 
 ```bash
+# from repo root
 psql "$DATABASE_URL" -f ingest/schema.sql
-psql "$DATABASE_URL" -f warehouse/stg_device_usage_hour.sql
-psql "$DATABASE_URL" -f warehouse/mart_device_daily_usage.sql
+cd dbt
+source .venv/bin/activate
+dbt deps && dbt build
+cd ..
 ```
 
 Run:

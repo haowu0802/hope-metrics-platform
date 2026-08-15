@@ -1,5 +1,4 @@
--- Grain: one row per device per US/Eastern calendar day.
--- Reads staging only (not raw).
+-- Device × US/Eastern day.
 
 select
     device_id,

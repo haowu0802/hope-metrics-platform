@@ -1,61 +1,31 @@
 # Hope Metrics dbt project
 
-Transforms live here (`raw` stays owned by ingest).
+Transforms (`stg` / `mart`). Ingest owns `raw_*`.
 
 ## Layout
 
 | Path | Role |
 |---|---|
-| `dbt_project.yml` | Project name, profile name, paths, default materializations |
-| `profiles.example.yml` | Template for `~/.dbt/profiles.yml` (no secrets in git) |
-| `packages.yml` | Optional community packages (empty for now) |
-| `models/staging/` | Sources + clean/dedupe models |
-| `models/marts/` | Business grains (later) |
-| `requirements.txt` | `dbt-postgres` for local installs |
+| `dbt_project.yml` | Project and default materializations |
+| `profiles.example.yml` | Copy to `~/.dbt/profiles.yml` |
+| `packages.yml` | `dbt_utils` |
+| `models/staging/` | Sources + dedupe |
+| `models/marts/` | Daily usage grain |
+| `requirements.txt` | `dbt-postgres` |
 
-Declared source (step 3): `source('hope', 'raw_device_usage_hour')` → table `public.raw_device_usage_hour`.
-
-Staging model: `stg_device_usage_hour` (view) — latest row per `(device_id, window_start)`.
-
-Mart model: `mart_device_daily_usage` (view) — device × Eastern day, `sum(active_minutes)`.
-
-## Quality checks
-
-After `dbt deps` (installs `dbt_utils`):
-
-```bash
-dbt build
-```
-
-Runs models then tests: composite unique keys, `not_null`, and non-negative minutes on stg/mart.
-
-
-## Install
+## Setup
 
 ```bash
 cd dbt
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-```
-
-## Connect + verify
-
-1. Copy the example profile and fill in the **same Postgres** ingest uses:
-
-```bash
 mkdir -p ~/.dbt
-cp profiles.example.yml ~/.dbt/profiles.yml
-# edit ~/.dbt/profiles.yml — replace YOUR_*
-```
-
-2. From `dbt/` with the venv active:
-
-```bash
+cp profiles.example.yml ~/.dbt/profiles.yml   # edit YOUR_*
 dbt debug
+dbt deps
+dbt build
 ```
 
-Success: `Connection test: OK` / `All checks passed!`
-
-Do not set `DBT_PROFILES_DIR` to this repo folder — use the default `~/.dbt`.  
-Do not run `dbt run` until staging/mart models exist (next steps).
+Models: `stg_device_usage_hour` (dedupe by device + hour), `mart_device_daily_usage` (device × US/Eastern day).
+Tests cover unique grains, `not_null`, and non-negative minutes.

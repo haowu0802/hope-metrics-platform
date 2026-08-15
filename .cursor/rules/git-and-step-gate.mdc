@@ -1,0 +1,26 @@
+---
+description: Agent constraints for hope-metrics-platform
+alwaysApply: true
+---
+
+# hope-metrics-platform — agent constraints
+
+## Git
+
+- Never create commits (`git commit`).
+- Never push (`git push`), including upstream or force push.
+- Never amend, rebase, or tag for the user.
+- Do not `git add` unless the user explicitly asks for add commands or staging.
+- The user commits and pushes manually.
+
+## Language and content
+
+- No Chinese in docs, comments, commit message suggestions, or user-facing repo text. English only.
+- No secrets in the repo: passwords, credentialed `DATABASE_URL`, absolute machine paths, private planning notes.
+- Prefer bland, direct engineering prose. Avoid hype, slogan-y openers, emoji, and filler ("robust", "seamless", "powerful", "production-grade", "aims to", tutorial padding) unless the user asks for marketing copy.
+
+## Architecture
+
+- Ingest owns `raw_*` writes. dbt owns stg/mart transforms. Do not reintroduce `warehouse/*.sql` as the publish path.
+- Probe (this repo) and simulator (separate repo) share the device event contract; do not merge simulator into this repo.
+- Work step by step. Before coding a step: state the motivation and wait for explicit agreement. Do not implement later MVP pieces (Airflow, Metabase, etc.) without agreement.
