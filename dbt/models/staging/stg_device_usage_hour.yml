@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: stg_device_usage_hour
+    description: >
+      Deduped hour grain. One row per (device_id, window_start), keeping the
+      latest _loaded_at then highest id. Reads source hope.raw_device_usage_hour.
+    columns:
+      - name: device_id
+        description: Device identifier.
+      - name: window_start
+        description: Hour window start (inclusive).
+      - name: active_minutes
+        description: Active minutes kept from the winning raw row.
+      - name: _loaded_at
+        description: Load time of the winning raw row.

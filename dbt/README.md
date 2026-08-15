@@ -15,6 +15,8 @@ Transforms live here (`raw` stays owned by ingest).
 
 Declared source (step 3): `source('hope', 'raw_device_usage_hour')` → table `public.raw_device_usage_hour`.
 
+Staging model: `stg_device_usage_hour` (view) — latest row per `(device_id, window_start)`.
+
 
 ## Install
 

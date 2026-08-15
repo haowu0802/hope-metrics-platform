@@ -1,0 +1,19 @@
+-- One row per (device_id, window_start): latest ingest load wins.
+-- Raw stays append-only; this view dedupes for marts.
+
+select distinct on (device_id, window_start)
+    id,
+    schema_version,
+    probe_version,
+    device_id,
+    window_start,
+    window_end,
+    active_minutes,
+    payload,
+    _loaded_at
+from {{ source('hope', 'raw_device_usage_hour') }}
+order by
+    device_id,
+    window_start,
+    _loaded_at desc,
+    id desc
