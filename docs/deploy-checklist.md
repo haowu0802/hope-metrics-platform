@@ -4,9 +4,10 @@ Do not commit secrets. Put `DATABASE_URL` in platform secrets / local `.env` onl
 
 ## Pieces
 
-1. Managed Postgres — `ingest/schema.sql` for raw; stg/mart via `dbt build`
-2. App from `ingest/` (`Dockerfile`, `fly.toml`)
-3. Optional custom domain later
+1. Managed Postgres — `ingest/schema.sql` for raw; stg/mart via `dbt build` (Airflow on Fly or local)
+2. Ingest app — `ingest/` → `hope-metrics`
+3. Airflow (+ dbt in image) — `airflow/` → `hope-metrics-airflow` (optional always-on schedule)
+4. Optional custom domain later
 
 ## First deploy / update
 

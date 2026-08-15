@@ -1,0 +1,35 @@
+app = "hope-metrics-airflow"
+primary_region = "sin"
+
+[build]
+  # Use: fly deploy . -c airflow/fly.toml --dockerfile airflow/Dockerfile.fly --ha=false
+  dockerfile = "Dockerfile.fly"
+
+[env]
+  PORT = "8080"
+  AIRFLOW__CORE__EXECUTOR = "LocalExecutor"
+  AIRFLOW__CORE__LOAD_EXAMPLES = "false"
+  AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION = "true"
+  AIRFLOW__API__AUTH_BACKENDS = "airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session"
+  DBT_PROFILES_DIR = "/home/airflow/.dbt"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  # Scheduler must stay up for daily dbt runs.
+  auto_stop_machines = "off"
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
+
+  [[http_service.checks]]
+    grace_period = "120s"
+    interval = "30s"
+    method = "GET"
+    path = "/health"
+    timeout = "10s"
+
+[[vm]]
+  memory = "2048mb"
+  cpu_kind = "shared"
+  cpus = 1

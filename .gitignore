@@ -19,6 +19,9 @@ dbt/target/
 dbt/dbt_packages/
 dbt/logs/
 dbt/.venv/
+airflow/.env
+airflow/.fly-admin.txt
+airflow/logs/
 
 # OS / editor
 .DS_Store

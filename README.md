@@ -8,6 +8,7 @@ Measures donated-device active use for a GenAI education pilot.
 - `ingest/` — HTTP ingest + simple dashboard
 - `warehouse/` — legacy SQL (reference only)
 - `dbt/` — stg/mart transforms and tests
+- `airflow/` — schedules `dbt build` (local Compose or Fly `hope-metrics-airflow`)
 
 See `docs/device-event-contract.md`, `docs/grains.md`, `docs/deploy-checklist.md`.
 
