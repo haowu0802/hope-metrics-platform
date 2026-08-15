@@ -9,9 +9,12 @@ Transforms live here (`raw` stays owned by ingest).
 | `dbt_project.yml` | Project name, profile name, paths, default materializations |
 | `profiles.example.yml` | Template for `~/.dbt/profiles.yml` (no secrets in git) |
 | `packages.yml` | Optional community packages (empty for now) |
-| `models/staging/` | Clean/dedupe models (later) |
+| `models/staging/` | Sources + clean/dedupe models |
 | `models/marts/` | Business grains (later) |
 | `requirements.txt` | `dbt-postgres` for local installs |
+
+Declared source (step 3): `source('hope', 'raw_device_usage_hour')` → table `public.raw_device_usage_hour`.
+
 
 ## Install
 

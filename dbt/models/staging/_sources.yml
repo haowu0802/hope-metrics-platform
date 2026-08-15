@@ -1,0 +1,26 @@
+# Upstream tables owned by ingest (not built by dbt).
+version: 2
+
+sources:
+  - name: hope
+    description: Hope Metrics operational Postgres (ingest landing zone).
+    schema: public
+    tables:
+      - name: raw_device_usage_hour
+        description: >
+          Append-only probe/simulator hour events. One row = one report for
+          one device time window [window_start, window_end). Re-sends add rows;
+          staging will dedupe later.
+        columns:
+          - name: id
+            description: Surrogate key from ingest insert.
+          - name: device_id
+            description: Device identifier (MachineGuid or sim-*).
+          - name: window_start
+            description: Hour window start (inclusive), timestamptz.
+          - name: window_end
+            description: Hour window end (exclusive), timestamptz.
+          - name: active_minutes
+            description: Active minutes in the window (non-negative).
+          - name: _loaded_at
+            description: When ingest wrote the row.
