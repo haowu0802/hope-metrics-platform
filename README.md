@@ -9,6 +9,7 @@ Measures donated-device active use for a GenAI education pilot.
 - `warehouse/` — legacy SQL (reference only)
 - `dbt/` — stg/mart transforms and tests
 - `airflow/` — schedules `dbt build` (local Compose or Fly `hope-metrics-airflow`)
+- `metabase/` — BI on marts (local Compose or Fly `hope-metrics-metabase`)
 
 See `docs/device-event-contract.md`, `docs/grains.md`, `docs/deploy-checklist.md`.
 

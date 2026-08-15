@@ -35,6 +35,8 @@
     .empty { color: #666; }
     code { font-size: 0.9em; }
     .hint { color: #777; font-size: 0.8rem; margin: 0.25rem 0 0; }
+    .links { font-size: 0.85rem; color: #555; margin: 0 0 1rem; }
+    .links a { color: #555; }
   </style>
 </head>
 <body>
@@ -46,6 +48,13 @@
       <a href="{{ lang_zh_href }}" class="{% if lang == 'zh' %}current{% endif %}">{{ t.lang_zh }}</a>
     </nav>
   </div>
+  {% if airflow_url or metabase_url %}
+  <p class="links">
+    {% if metabase_url %}<a href="{{ metabase_url }}">{{ t.link_metabase }}</a>{% endif %}
+    {% if metabase_url and airflow_url %} · {% endif %}
+    {% if airflow_url %}<a href="{{ airflow_url }}">{{ t.link_airflow }}</a>{% endif %}
+  </p>
+  {% endif %}
   <div class="notes">
     {{ t.note_active }}<br />
     {{ t.note_grain }}<br />

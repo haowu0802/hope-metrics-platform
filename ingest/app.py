@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Annotated, Any
 
@@ -110,6 +111,8 @@ def dashboard(
             "lang_en_href": lang_en_href,
             "lang_zh_href": lang_zh_href,
             "clear_href": clear_href,
+            "airflow_url": os.environ.get("AIRFLOW_URL", "").strip() or None,
+            "metabase_url": os.environ.get("METABASE_URL", "").strip() or None,
         },
     )
 
