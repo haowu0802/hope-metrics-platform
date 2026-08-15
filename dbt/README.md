@@ -19,6 +19,16 @@ Staging model: `stg_device_usage_hour` (view) — latest row per `(device_id, wi
 
 Mart model: `mart_device_daily_usage` (view) — device × Eastern day, `sum(active_minutes)`.
 
+## Quality checks
+
+After `dbt deps` (installs `dbt_utils`):
+
+```bash
+dbt build
+```
+
+Runs models then tests: composite unique keys, `not_null`, and non-negative minutes on stg/mart.
+
 
 ## Install
 

@@ -5,10 +5,25 @@ models:
     description: >
       Device x US/Eastern day. active_minutes_day = sum of staging active_minutes
       for that Eastern calendar date. Built from ref('stg_device_usage_hour'), not raw.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - device_id
+              - usage_date
     columns:
       - name: device_id
         description: Device identifier.
+        data_tests:
+          - not_null
       - name: usage_date
         description: Calendar date in America/New_York.
+        data_tests:
+          - not_null
       - name: active_minutes_day
         description: Sum of active minutes that day.
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"

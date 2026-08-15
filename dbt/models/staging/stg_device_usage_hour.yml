@@ -5,12 +5,29 @@ models:
     description: >
       Deduped hour grain. One row per (device_id, window_start), keeping the
       latest _loaded_at then highest id. Reads source hope.raw_device_usage_hour.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - device_id
+              - window_start
     columns:
       - name: device_id
         description: Device identifier.
+        data_tests:
+          - not_null
       - name: window_start
         description: Hour window start (inclusive).
+        data_tests:
+          - not_null
       - name: active_minutes
         description: Active minutes kept from the winning raw row.
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"
       - name: _loaded_at
         description: Load time of the winning raw row.
+        data_tests:
+          - not_null
