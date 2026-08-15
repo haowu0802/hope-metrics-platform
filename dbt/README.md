@@ -17,6 +17,8 @@ Declared source (step 3): `source('hope', 'raw_device_usage_hour')` → table `p
 
 Staging model: `stg_device_usage_hour` (view) — latest row per `(device_id, window_start)`.
 
+Mart model: `mart_device_daily_usage` (view) — device × Eastern day, `sum(active_minutes)`.
+
 
 ## Install
 

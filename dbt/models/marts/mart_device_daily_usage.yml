@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: mart_device_daily_usage
+    description: >
+      Device x US/Eastern day. active_minutes_day = sum of staging active_minutes
+      for that Eastern calendar date. Built from ref('stg_device_usage_hour'), not raw.
+    columns:
+      - name: device_id
+        description: Device identifier.
+      - name: usage_date
+        description: Calendar date in America/New_York.
+      - name: active_minutes_day
+        description: Sum of active minutes that day.
