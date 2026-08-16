@@ -1,0 +1,17 @@
+device_id,display_name,display_name_zh,persona,site,is_demo_noise,notes
+b4b8a740-ae48-4171-b90b-10631222a612,Probe machine A,探针机甲,probe,field,false,Real Windows probe — keep in warehouse and demo
+d2819ffb-2be9-47b8-9229-a2747742c8c2,Probe machine B,探针机乙,probe,field,false,Real Windows probe — activity may lack CPU/GPU (pre-v2)
+sim-ailab-01,AI lab 01,AI实验室01,ailab,demo-lab,false,Simulator persona with CPU/GPU
+sim-ailab-02,AI lab 02,AI实验室02,ailab,demo-lab,false,Simulator persona with CPU/GPU
+sim-classroom-01,Classroom 01,教室电脑01,classroom,demo-lab,false,Simulator persona
+sim-classroom-02,Classroom 02,教室电脑02,classroom,demo-lab,false,Simulator persona
+sim-loaner-01,Loaner 01,外借电脑01,loaner,demo-lab,false,Simulator persona
+sim-loaner-02,Loaner 02,外借电脑02,loaner,demo-lab,false,Simulator persona
+sim-staff-01,Staff 01,教职工电脑01,staff,demo-lab,false,Simulator persona
+sim-staff-02,Staff 02,教职工电脑02,staff,demo-lab,false,Simulator persona
+sim-0001,Legacy sim 0001,旧模拟器0001,legacy,smoke,true,Early simulator — hide from stakeholder demo
+sim-0002,Legacy sim 0002,旧模拟器0002,legacy,smoke,true,Early simulator — hide from stakeholder demo
+demo-site-a,Demo site A,演示站点A,smoke,smoke,true,Synthetic smoke — hide from stakeholder demo
+demo-site-b,Demo site B,演示站点B,smoke,smoke,true,Synthetic smoke — hide from stakeholder demo
+fly-smoke-001,Fly smoke,Fly冒烟测试,smoke,smoke,true,Deploy smoke — hide from stakeholder demo
+neon-smoke-001,Neon smoke,Neon冒烟测试,smoke,smoke,true,Deploy smoke — hide from stakeholder demo

@@ -1,0 +1,33 @@
+version: 2
+
+models:
+  - name: mart_device_summary
+    description: Lifetime rollup per device including resource averages.
+    data_tests:
+      - unique:
+          column_name: device_id
+    columns:
+      - name: device_id
+        data_tests:
+          - not_null
+      - name: first_seen_date
+        data_tests:
+          - not_null
+      - name: last_seen_date
+        data_tests:
+          - not_null
+      - name: active_days
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "> 0"
+      - name: active_minutes_total
+        data_tests:
+          - not_null
+      - name: active_minutes_avg_day
+        data_tests:
+          - not_null
+      - name: utilization_pct_avg
+        data_tests:
+          - not_null

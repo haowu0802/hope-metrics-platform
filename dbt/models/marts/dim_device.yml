@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: dim_device
+    description: >
+      Device dimension. Warehouse never drops real machines; is_demo_noise only
+      gates stakeholder demo marts and alert noise.
+    columns:
+      - name: device_id
+        tests: [unique, not_null]
+      - name: display_name_zh
+        tests: [not_null]
+      - name: include_in_demo
+        tests: [not_null]
+      - name: is_demo_noise
+        tests: [not_null]

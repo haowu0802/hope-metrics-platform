@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: mart_device_staleness
+    description: >
+      Per-device days since last China-calendar activity. is_stale when
+      days_since_seen >= 2 (unused-machine alert candidate).
+    data_tests:
+      - unique:
+          column_name: device_id
+    columns:
+      - name: device_id
+        data_tests:
+          - not_null
+      - name: last_seen_date
+        data_tests:
+          - not_null
+      - name: days_since_seen
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"
+      - name: is_stale
+        data_tests:
+          - not_null

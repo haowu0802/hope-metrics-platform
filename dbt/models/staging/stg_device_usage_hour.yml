@@ -2,7 +2,7 @@ version: 2
 
 models:
   - name: stg_device_usage_hour
-    description: Latest row per (device_id, window_start).
+    description: Latest row per (device_id, window_start), including v2 resource metrics.
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:

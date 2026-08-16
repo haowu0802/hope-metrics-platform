@@ -1,0 +1,60 @@
+version: 2
+
+models:
+  - name: mart_device_daily_usage_cn_demo
+    description: CN device-day for stakeholder demo (excludes is_demo_noise only).
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [device_id, usage_date]
+    columns:
+      - name: device_id
+        tests: [not_null]
+      - name: usage_date
+        tests: [not_null]
+      - name: has_resource_metrics
+        tests: [not_null]
+
+  - name: mart_fleet_daily_cn_demo
+    description: Fleet daily rollup from demo cohort.
+    columns:
+      - name: usage_date
+        tests: [unique, not_null]
+
+  - name: mart_device_summary_cn_demo
+    description: Device lifetime summary for demo cohort (includes real probes).
+    columns:
+      - name: device_id
+        tests: [unique, not_null]
+
+  - name: mart_hour_of_day_cn_demo
+    description: Hour-of-day (Beijing) for demo cohort.
+    columns:
+      - name: hour_cn
+        tests: [unique, not_null]
+
+  - name: mart_device_hour_cn_demo
+    description: >
+      Near-real-time device-hour rows for demo cohort (view over staging).
+      Use for stakeholder "live today / last 24h" charts; daily marts remain for trends.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [device_id, window_start]
+    columns:
+      - name: device_id
+        tests: [not_null]
+      - name: window_start
+        tests: [not_null]
+      - name: display_name_zh
+        tests: [not_null]
+      - name: has_resource_metrics
+        tests: [not_null]
+
+  - name: mart_device_staleness_demo
+    description: Unused-device flags for demo cohort / Airflow alerts.
+    columns:
+      - name: device_id
+        tests: [unique, not_null]
+      - name: is_stale
+        tests: [not_null]

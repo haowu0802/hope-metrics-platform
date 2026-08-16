@@ -1,0 +1,15 @@
+version: 2
+
+models:
+  - name: mart_fleet_daily_cn
+    description: Fleet KPIs per Asia/Shanghai day (demo grain).
+    data_tests:
+      - unique:
+          column_name: usage_date
+    columns:
+      - name: usage_date
+        data_tests:
+          - not_null
+      - name: active_devices
+        data_tests:
+          - not_null

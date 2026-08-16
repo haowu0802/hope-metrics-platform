@@ -27,5 +27,10 @@ dbt deps
 dbt build
 ```
 
-Models: `stg_device_usage_hour` (dedupe by device + hour), `mart_device_daily_usage` (device × US/Eastern day).
+Models: `stg_device_usage_hour`; ET marts + `_cn` twins (`Asia/Shanghai`); `dim_device` + `*_cn_demo` stakeholder views (smoke hidden; **real probes kept**); `mart_device_staleness` (all) / `_demo` (alerts).
+
+Seed: `seeds/device_registry.csv` — labels only; never deletes warehouse rows.
+
 Tests cover unique grains, `not_null`, and non-negative minutes.
+
+After model changes used by Airflow, **deploy Fly Airflow** so the image picks up `dbt/` (`bash airflow/deploy.sh`).

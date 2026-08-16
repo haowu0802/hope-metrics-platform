@@ -18,5 +18,13 @@ sources:
             description: Window end (exclusive).
           - name: active_minutes
             description: Active minutes in the window.
+          - name: cpu_util_avg_pct
+            description: Mean CPU utilization percent (v2; null for v1).
+          - name: gpu_util_avg_pct
+            description: Mean GPU utilization percent or null.
+          - name: mem_util_avg_pct
+            description: Mean memory used percent (v2; null for v1).
+          - name: disk_free_gb
+            description: System volume free space GiB (v2; null for v1).
           - name: _loaded_at
             description: Ingest write time.

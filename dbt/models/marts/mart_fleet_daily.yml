@@ -1,0 +1,33 @@
+version: 2
+
+models:
+  - name: mart_fleet_daily
+    description: Fleet-level KPIs per US/Eastern day including resource averages.
+    data_tests:
+      - unique:
+          column_name: usage_date
+    columns:
+      - name: usage_date
+        data_tests:
+          - not_null
+      - name: active_devices
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"
+      - name: active_minutes_total
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"
+      - name: active_minutes_avg_device
+        data_tests:
+          - not_null
+      - name: devices_ge_1h
+        data_tests:
+          - not_null
+      - name: utilization_pct_avg
+        data_tests:
+          - not_null

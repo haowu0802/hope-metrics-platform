@@ -2,7 +2,9 @@ version: 2
 
 models:
   - name: mart_device_daily_usage
-    description: Sum of staging active_minutes by device and US/Eastern date.
+    description: >
+      Sum of staging active_minutes by device and US/Eastern date, plus
+      active_hour_slots, utilization_pct, and mean CPU/GPU/mem with min disk free.
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
@@ -17,6 +19,18 @@ models:
         data_tests:
           - not_null
       - name: active_minutes_day
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"
+      - name: active_hour_slots
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"
+      - name: utilization_pct
         data_tests:
           - not_null
           - dbt_utils.expression_is_true:

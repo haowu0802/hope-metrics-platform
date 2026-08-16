@@ -1,0 +1,19 @@
+version: 2
+
+seeds:
+  - name: device_registry
+    description: >
+      Curated labels for known devices. Does not delete warehouse facts.
+      is_demo_noise=true only hides a device from stakeholder demo marts/alerts;
+      raw + core marts still keep every device_id (including real probes).
+      display_name_zh is the stakeholder-facing label (Metabase dropdown remap).
+    config:
+      column_types:
+        is_demo_noise: boolean
+    columns:
+      - name: device_id
+        tests: [unique, not_null]
+      - name: display_name_zh
+        tests: [not_null]
+      - name: is_demo_noise
+        tests: [not_null]

@@ -1,0 +1,15 @@
+version: 2
+
+models:
+  - name: mart_device_summary_cn
+    description: Lifetime rollup per device from China device-day mart.
+    data_tests:
+      - unique:
+          column_name: device_id
+    columns:
+      - name: device_id
+        data_tests:
+          - not_null
+      - name: last_seen_date
+        data_tests:
+          - not_null
