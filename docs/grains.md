@@ -17,9 +17,22 @@ One row = one `(device_id, window_start)` after dedupe.
 - Keep latest `_loaded_at`, then highest `id`.
 - Marts read this view, not raw.
 
-## `mart_device_daily_usage`
+## Reporting timezones
 
-One row = one device on one US Eastern day (`America/New_York`).
+| Suffix | Timezone | Use |
+|---|---|---|
+| _(none)_ / `_et` | `America/New_York` | US / internal |
+| `_cn` | `Asia/Shanghai` | **China demo / stakeholders** |
 
-- `active_minutes_day` = sum of staging `active_minutes` for that date.
-- If the kept staging row is partial, those minutes still count.
+Twin marts share the same metrics; only calendar day and hour-of-day differ.
+
+## Device-day / fleet / hour / summary
+
+- `mart_device_daily_usage` / `_cn` — device × local day (+ CPU/GPU/mem/disk)
+- `mart_fleet_daily` / `_cn` — fleet KPIs per local day
+- `mart_hour_of_day` (`hour_et`) / `_cn` (`hour_cn`) — hour-of-day patterns
+- `mart_device_summary` / `_cn` — lifetime rollup per device
+
+## `mart_device_staleness`
+
+One row per device (from China summary): `days_since_seen`, `is_stale` (default ≥ 2 China calendar days). Used by Airflow `hope_device_alerts`.

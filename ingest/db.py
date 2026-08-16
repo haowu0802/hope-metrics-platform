@@ -29,6 +29,46 @@ def list_device_ids() -> list[str]:
             return [str(r[0]) for r in cur.fetchall()]
 
 
+def fetch_status_summary() -> dict[str, Any]:
+    """Compact KPIs for the ingest status page (no filters)."""
+    sql = """
+        SELECT
+            COUNT(DISTINCT device_id)::int AS device_count,
+            COUNT(*)::int AS row_count,
+            COALESCE(SUM(active_minutes_day), 0)::int AS total_minutes,
+            MIN(usage_date) AS date_from,
+            MAX(usage_date) AS date_to
+        FROM mart_device_daily_usage
+    """
+    last_sql = """
+        SELECT MAX(_loaded_at) AS last_ingest_at
+        FROM raw_device_usage_hour
+    """
+    with psycopg.connect(database_url()) as conn:
+        with conn.cursor() as cur:
+            cur.execute(sql)
+            r = cur.fetchone()
+            assert r is not None
+            cur.execute(last_sql)
+            last = cur.fetchone()
+    last_at = last[0] if last else None
+    last_display = None
+    if last_at is not None and hasattr(last_at, "strftime"):
+        # UTC timestamp, compact for the status page
+        last_display = last_at.strftime("%Y-%m-%d %H:%M UTC")
+    elif last_at is not None:
+        last_display = str(last_at)
+    return {
+        "device_count": int(r[0] or 0),
+        "row_count": int(r[1] or 0),
+        "total_minutes": int(r[2] or 0),
+        "date_from": r[3].isoformat() if r[3] is not None and hasattr(r[3], "isoformat") else (str(r[3]) if r[3] else None),
+        "date_to": r[4].isoformat() if r[4] is not None and hasattr(r[4], "isoformat") else (str(r[4]) if r[4] else None),
+        "last_ingest_at": last_at.isoformat() if last_at is not None and hasattr(last_at, "isoformat") else (str(last_at) if last_at else None),
+        "last_ingest_display": last_display,
+    }
+
+
 def fetch_daily_usage(
     *,
     date_from: date | None = None,
@@ -170,6 +210,10 @@ def insert_usage_hour(event: dict[str, Any]) -> int:
             window_start,
             window_end,
             active_minutes,
+            cpu_util_avg_pct,
+            gpu_util_avg_pct,
+            mem_util_avg_pct,
+            disk_free_gb,
             payload
         ) VALUES (
             %(schema_version)s,
@@ -178,6 +222,10 @@ def insert_usage_hour(event: dict[str, Any]) -> int:
             %(window_start)s,
             %(window_end)s,
             %(active_minutes)s,
+            %(cpu_util_avg_pct)s,
+            %(gpu_util_avg_pct)s,
+            %(mem_util_avg_pct)s,
+            %(disk_free_gb)s,
             %(payload)s::jsonb
         )
         RETURNING id
@@ -189,6 +237,10 @@ def insert_usage_hour(event: dict[str, Any]) -> int:
         "window_start": window_start,
         "window_end": window_end,
         "active_minutes": active_minutes,
+        "cpu_util_avg_pct": event.get("cpu_util_avg_pct"),
+        "gpu_util_avg_pct": event.get("gpu_util_avg_pct"),
+        "mem_util_avg_pct": event.get("mem_util_avg_pct"),
+        "disk_free_gb": event.get("disk_free_gb"),
         "payload": json.dumps(event, default=str),
     }
     with psycopg.connect(database_url()) as conn:

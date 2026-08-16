@@ -1,15 +1,11 @@
 # ingest
 
 `POST /v1/events` appends to `raw_device_usage_hour`.  
-`GET /` shows `mart_device_daily_usage` with filters, daily trend, and device rank (UI: English default; `?lang=zh` for Chinese). Health: `GET /health`.
+`GET /` is a thin status page (KPIs + links to Metabase / Airflow). Charts live in Metabase. Health: `GET /health`.
 
-Dashboard query params (shareable):
+Optional UI lang: `/?lang=zh`.
 
-```text
-/?lang=zh&date_from=2026-07-28&date_to=2026-07-30&device_id=demo-site-a&device_id=demo-site-b
-```
-
-JSON: `GET /api/v1/daily-usage` accepts the same `date_from` / `date_to` / `device_id` filters and returns `summary`, `trend`, `rank`, `rows`.
+JSON: `GET /api/v1/daily-usage` accepts `date_from` / `date_to` / `device_id` filters and returns `summary`, `trend`, `rank`, `rows`.
 
 ## Setup
 

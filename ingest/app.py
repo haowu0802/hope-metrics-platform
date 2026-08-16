@@ -1,4 +1,4 @@
-"""Ingest API and dashboard."""
+"""Ingest API and status page."""
 
 from __future__ import annotations
 
@@ -16,8 +16,8 @@ from db import (
     fetch_daily_trend,
     fetch_daily_usage,
     fetch_device_rank,
+    fetch_status_summary,
     insert_usage_hour,
-    list_device_ids,
     summarize_daily_usage,
 )
 from filters import build_query, normalize_device_ids, parse_iso_date
@@ -27,7 +27,7 @@ _root = Path(__file__).resolve().parent.parent
 load_dotenv(_root / ".env")
 load_dotenv(Path(__file__).resolve().parent / ".env")
 
-app = FastAPI(title="hope-metrics-ingest", version="0.1.0")
+app = FastAPI(title="hope-metrics-ingest", version="0.2.0")
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent / "templates"))
 
 
@@ -38,6 +38,11 @@ class UsageHourEvent(BaseModel):
     window_start: str
     window_end: str
     active_minutes: int = Field(..., ge=0)
+    # v2 resource fields (optional for schema_version=1 emitters)
+    cpu_util_avg_pct: float | None = Field(default=None, ge=0, le=100)
+    gpu_util_avg_pct: float | None = Field(default=None, ge=0, le=100)
+    mem_util_avg_pct: float | None = Field(default=None, ge=0, le=100)
+    disk_free_gb: float | None = Field(default=None, ge=0)
 
     @field_validator("schema_version", "probe_version", "device_id", "window_start", "window_end")
     @classmethod
@@ -53,64 +58,22 @@ def health() -> dict[str, str]:
 
 
 @app.get("/", response_class=HTMLResponse)
-def dashboard(
-    request: Request,
-    lang: str | None = None,
-    date_from: str | None = None,
-    date_to: str | None = None,
-    device_id: Annotated[list[str] | None, Query()] = None,
-) -> HTMLResponse:
+def status_page(request: Request, lang: str | None = None) -> HTMLResponse:
     locale = resolve_lang(lang)
-    df = parse_iso_date(date_from)
-    dt = parse_iso_date(date_to)
-    if df and dt and df > dt:
-        df, dt = dt, df
-    devices = normalize_device_ids(device_id)
-    filters_active = bool(df or dt or devices)
-
     try:
-        device_options = list_device_ids()
-        rows = fetch_daily_usage(date_from=df, date_to=dt, device_ids=devices or None)
-        summary = summarize_daily_usage(rows)
-        trend = fetch_daily_trend(date_from=df, date_to=dt, device_ids=devices or None)
-        rank = fetch_device_rank(date_from=df, date_to=dt, device_ids=devices or None)
+        status = fetch_status_summary()
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
-
-    date_from_s = df.isoformat() if df else ""
-    date_to_s = dt.isoformat() if dt else ""
-    lang_en_href = "/" + build_query(
-        lang="en",
-        date_from=date_from_s or None,
-        date_to=date_to_s or None,
-        device_id=devices,
-    )
-    lang_zh_href = "/" + build_query(
-        lang="zh",
-        date_from=date_from_s or None,
-        date_to=date_to_s or None,
-        device_id=devices,
-    )
-    clear_href = "/" + build_query(lang=locale if locale != "en" else None)
 
     return templates.TemplateResponse(
         request,
         "dashboard.html",
         {
-            "rows": rows,
-            "summary": summary,
-            "trend": trend,
-            "rank": rank,
+            "status": status,
             "lang": locale,
             "t": messages_for(locale),
-            "device_options": device_options,
-            "selected_devices": devices,
-            "date_from": date_from_s,
-            "date_to": date_to_s,
-            "filters_active": filters_active,
-            "lang_en_href": lang_en_href,
-            "lang_zh_href": lang_zh_href,
-            "clear_href": clear_href,
+            "lang_en_href": "/" + build_query(lang="en"),
+            "lang_zh_href": "/" + build_query(lang="zh"),
             "airflow_url": os.environ.get("AIRFLOW_URL", "").strip() or None,
             "metabase_url": os.environ.get("METABASE_URL", "").strip() or None,
         },

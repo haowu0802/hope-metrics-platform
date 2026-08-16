@@ -8,7 +8,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app.py db.py ./
+COPY app.py db.py filters.py i18n.py ./
 COPY templates ./templates
 
 ENV PORT=8080
