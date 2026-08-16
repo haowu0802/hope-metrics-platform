@@ -41,3 +41,5 @@ probe/_test_guid.log
 probe/_test_guid.err
 probe/*.log
 probe/*.err
+
+metabase/.fly-admin.txt

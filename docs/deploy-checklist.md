@@ -4,10 +4,10 @@ Do not commit secrets. Put `DATABASE_URL` in platform secrets / local `.env` onl
 
 ## Pieces
 
-1. Managed Postgres — `ingest/schema.sql` for raw; stg/mart via `dbt build` (Airflow on Fly or local)
+1. Managed Postgres — `ingest/schema.sql` for raw; stg/mart via `dbt build` (scheduled on Fly Airflow)
 2. Ingest app — `ingest/` → `hope-metrics`
-3. Airflow (+ dbt in image) — `airflow/` → `hope-metrics-airflow`
-4. Metabase — `metabase/` → `hope-metrics-metabase` (add Hope Neon in Admin → Databases)
+3. Airflow (+ dbt in image) — `airflow/` → `hope-metrics-airflow` (**deploy on every DAG/dbt change**)
+4. Metabase — `metabase/` → `hope-metrics-metabase` (add Hope Neon in Admin → Databases; re-run `metabase/seed_cn_demo.py` after new marts)
 5. Optional custom domain later
 
 ## First deploy / update
@@ -19,6 +19,12 @@ cd dbt
 source .venv/bin/activate
 dbt deps
 dbt build
+```
+
+**Airflow** (default — embeds latest `dbt/` + DAGs; do not use local Compose for demos):
+
+```bash
+bash airflow/deploy.sh
 ```
 
 **App** from `ingest/`:

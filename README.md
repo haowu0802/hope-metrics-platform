@@ -5,7 +5,7 @@ Measures donated-device active use for a GenAI education pilot.
 ## Repo layout
 
 - `probe/` — Windows agent (active minutes per hour)
-- `ingest/` — HTTP ingest + simple dashboard
+- `ingest/` — HTTP ingest + status page (links to Metabase / Airflow)
 - `warehouse/` — legacy SQL (reference only)
 - `dbt/` — stg/mart transforms and tests
 - `airflow/` — schedules `dbt build` (local Compose or Fly `hope-metrics-airflow`)
@@ -13,7 +13,7 @@ Measures donated-device active use for a GenAI education pilot.
 
 See `docs/device-event-contract.md`, `docs/grains.md`, `docs/deploy-checklist.md`.
 
-## Run ingest + dashboard locally
+## Run ingest + status page locally
 
 Needs `DATABASE_URL` in a repo-root `.env`, and schema/views applied (see `ingest/README.md`).
 
