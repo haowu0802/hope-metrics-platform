@@ -1,65 +1,59 @@
-# Airflow — schedule dbt build
+# Airflow — schedule dbt + alerts (Fly by default)
 
-Runs `dbt build` daily. Local Compose for laptop demos; Fly for always-on scheduling against Neon.
+**Default workflow:** change DAGs or `dbt/` → deploy to Fly. Do not rely on local Compose for the product demo.
+
+UI: https://hope-metrics-airflow.fly.dev/
 
 ## Layout
 
 | Path | Role |
 |---|---|
 | `dags/hope_dbt_daily.py` | Daily `dbt build`; optional Feishu on failure |
-| `docker-compose.yml` | Local webserver + scheduler + metadata Postgres |
-| `Dockerfile` | Local image + `dbt-postgres` |
-| `Dockerfile.fly` | Fly image: Airflow + dbt project + `dbt deps` |
-| `fly.toml` / `deploy.sh` | App `hope-metrics-airflow` |
-| `scripts/fly-entrypoint.sh` | Write dbt profiles from `DATABASE_URL`, migrate, run scheduler+web |
+| `dags/hope_device_alerts.py` | Unused-device Feishu alert |
+| `dags/hope_daily_feishu_report.py` | Daily Feishu digest + Metabase public link |
+| `dags/hope_weekly_feishu_report.py` | Weekly Feishu digest (prev Mon–Sun CN) |
+| `dags/hope_monthly_feishu_report.py` | Monthly Feishu digest (prev CN month) |
+| `dags/hope_report_common.py` | Shared digest helpers (URL sanitize, freshness) |
+| `dags/hope_feishu.py` | Shared Feishu webhook helper |
+| `FEISHU.md` | Webhook + keyword (`hope`) setup |
+| `README_DAGS.md` | When to add more DAGs |
+| `Dockerfile.fly` / `fly.toml` / `deploy.sh` | **Primary** always-on deploy |
+| `docker-compose.yml` | Optional laptop-only; not used for demos |
 
-## Local Compose
+## Deploy (default)
 
-Prerequisites: Docker; host `dbt deps` once; `%USERPROFILE%\.dbt\profiles.yml` or `~/.dbt/profiles.yml`.
+From **repo root** (image embeds `airflow/dags` + `dbt/`):
 
 ```bash
-cd airflow
-cp .env.example .env
-# set AIRFLOW__CORE__FERNET_KEY
-docker compose up -d --build
+bash airflow/deploy.sh
+# Windows-friendly equivalent:
+# fly deploy . -c airflow/fly.toml --dockerfile airflow/Dockerfile.fly --ha=false
 ```
 
-UI: http://127.0.0.1:8081 — `admin` / `admin`.
+After deploy: confirm both `hope_dbt_daily` and `hope_device_alerts` appear; unpause if needed; Trigger once.
 
-## Fly (always-on)
-
-dbt is **not** a separate app. It ships inside the Airflow image and runs when the DAG fires.
-
-1. On Neon, create a second database for Airflow metadata (e.g. `airflow`).
-2. Create app and secrets (once):
+### Secrets (once)
 
 ```bash
-fly apps create hope-metrics-airflow -o personal   # if needed
 fly secrets set -a hope-metrics-airflow \
   DATABASE_URL='postgresql://...@.../neondb?sslmode=require' \
   AIRFLOW__DATABASE__SQL_ALCHEMY_CONN='postgresql+psycopg2://...@.../airflow?sslmode=require' \
   AIRFLOW__CORE__FERNET_KEY='...' \
   AIRFLOW_ADMIN_USER='admin' \
   AIRFLOW_ADMIN_PASSWORD='...'
-# optional: FEISHU_WEBHOOK_URL='...'
+# optional: see airflow/FEISHU.md
+# FEISHU_WEBHOOK_URL='...'  STALE_DEVICE_DAYS='2'
 ```
 
 `DATABASE_URL` = Hope metrics DB (same as ingest).  
-`AIRFLOW__DATABASE__SQL_ALCHEMY_CONN` = Airflow metadata DB (not the metrics DB).
-
-3. Deploy from **repo root** (build context must include `dbt/`):
-
-```bash
-bash airflow/deploy.sh
-# or: fly deploy . -c airflow/fly.toml --ha=false
-```
-
-UI: https://hope-metrics-airflow.fly.dev/
-
-Unpause `hope_dbt_daily`, then Trigger once to verify.
+`AIRFLOW__DATABASE__SQL_ALCHEMY_CONN` = Airflow metadata DB (separate Neon database).
 
 ## Notes
 
 - Fly keeps `min_machines_running = 1` so the daily schedule is not lost to auto-stop.
 - Image is ~2GB RAM class; adjust `fly.toml` if OOM.
-- Local Compose metadata Postgres is separate from Neon.
+- Alerts use the **demo cohort** (real probes + sim personas; smoke IDs excluded). Core marts still store every `device_id`.
+
+## Local Compose (optional only)
+
+Not part of the default path. If you must run Compose: `cd airflow && docker compose up -d --build` → http://127.0.0.1:8081. Prefer Fly for anything you will show stakeholders.
