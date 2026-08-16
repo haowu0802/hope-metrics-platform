@@ -14,6 +14,7 @@ import (
 	"github.com/haowu0802/hope-metrics-platform/probe/internal/logx"
 	"github.com/haowu0802/hope-metrics-platform/probe/internal/schedule"
 	"github.com/haowu0802/hope-metrics-platform/probe/internal/sink"
+	"github.com/haowu0802/hope-metrics-platform/probe/internal/sysmetrics"
 	"github.com/haowu0802/hope-metrics-platform/probe/internal/window"
 )
 
@@ -52,8 +53,12 @@ func main() {
 		time.Duration(cfg.IdleSeconds)*time.Second,
 	)
 
+	metrics := &sysmetrics.Sampler{}
+	defer metrics.Close()
+
 	runner := &schedule.Runner{
 		Sampler:      activity.New(),
+		Metrics:      metrics,
 		Acc:          acc,
 		Store:        store,
 		Log:          log,

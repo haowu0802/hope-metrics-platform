@@ -1,6 +1,14 @@
 # hope-probe (Windows)
 
-Counts active-use minutes per clock hour, writes local JSON, POSTs to ingest when a URL is set.
+Counts active-use minutes per clock hour, samples CPU/mem/disk/GPU when available, writes local JSON, POSTs to ingest when a URL is set.
+
+GPU (`gpu_util_avg_pct`) on Windows, in order:
+
+1. **NVML** (`nvml.dll` from the NVIDIA driver)
+2. **PDH** `\GPU Engine(*)\Utilization Percentage` (WDDM; NVIDIA/AMD/Intel)
+3. **`nvidia-smi`** CLI fallback
+
+If none work (no GPU / no counters), the field stays JSON `null` — not `0`.
 
 This component **runs and builds on Windows only** (OS APIs). Platform docs elsewhere default to macOS/Linux shells.
 

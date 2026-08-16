@@ -8,11 +8,13 @@ import (
 	"github.com/haowu0802/hope-metrics-platform/probe/internal/event"
 	"github.com/haowu0802/hope-metrics-platform/probe/internal/logx"
 	"github.com/haowu0802/hope-metrics-platform/probe/internal/sink"
+	"github.com/haowu0802/hope-metrics-platform/probe/internal/sysmetrics"
 	"github.com/haowu0802/hope-metrics-platform/probe/internal/window"
 )
 
 type Runner struct {
 	Sampler      activity.Sampler
+	Metrics      *sysmetrics.Sampler
 	Acc          *window.Accumulator
 	Store        *sink.Store
 	Log          *logx.Logger
@@ -96,7 +98,16 @@ func (r *Runner) sampleOnce() {
 	if ev, ok := r.Acc.FlushClosedIfNeeded(now); ok {
 		r.persist(ev)
 	}
-	r.Acc.Sample(now, age)
+
+	var snapPtr *sysmetrics.Snapshot
+	if r.Metrics != nil {
+		if snap, merr := r.Metrics.Sample(); merr != nil {
+			r.Log.Debugf("sysmetrics: %v", merr)
+		} else {
+			snapPtr = &snap
+		}
+	}
+	r.Acc.SampleWithMetrics(now, age, snapPtr)
 }
 
 func (r *Runner) flushShutdown() {
@@ -114,10 +125,13 @@ func (r *Runner) persist(ev event.UsageHour) {
 		r.Log.Errorf("write local: %v", err)
 		return
 	}
-	r.Log.Infof("flushed hour start=%s end=%s active_minutes=%d file=%s",
+	r.Log.Infof("flushed hour start=%s end=%s active_minutes=%d cpu=%.1f mem=%.1f disk=%.1f file=%s",
 		ev.WindowStart.Format(time.RFC3339),
 		ev.WindowEnd.Format(time.RFC3339),
 		ev.ActiveMinutes,
+		ev.CPUUtilAvgPct,
+		ev.MemUtilAvgPct,
+		ev.DiskFreeGB,
 		path,
 	)
 }

@@ -25,8 +25,8 @@ var (
 
 const (
 	DefaultIdleSeconds   = 600 // 10 minutes
-	DefaultProbeVersion  = "0.1.0"
-	DefaultSchemaVersion = "1"
+	DefaultProbeVersion  = "0.2.1"
+	DefaultSchemaVersion = "2"
 	DefaultOutDir        = "out"
 	DefaultFlushEvery    = time.Minute
 	DefaultUploadEvery   = 2 * time.Minute
