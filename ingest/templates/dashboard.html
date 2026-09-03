@@ -344,16 +344,7 @@
           <span class="desc">{{ t.metabase_desc }}</span>
         </a>
       </li>
-      {% endif %}
-      {% if airflow_url %}
-      <li>
-        <a href="{{ airflow_url }}">
-          <span class="title">{{ t.link_airflow }} <span class="arrow" aria-hidden="true">→</span></span>
-          <span class="desc">{{ t.airflow_desc }}</span>
-        </a>
-      </li>
-      {% endif %}
-      {% if not metabase_url and not airflow_url %}
+      {% else %}
       <li><span class="unset">{{ t.tools_unset }}</span></li>
       {% endif %}
     </ul>

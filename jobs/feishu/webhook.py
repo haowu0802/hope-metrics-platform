@@ -1,4 +1,4 @@
-"""Shared Feishu/Lark incoming-webhook helper for Hope Airflow DAGs."""
+"""Feishu/Lark incoming-webhook helper."""
 
 from __future__ import annotations
 
@@ -10,7 +10,6 @@ import urllib.request
 
 logger = logging.getLogger(__name__)
 
-# Custom bot keyword security (group bot setting). Must appear in message text.
 DEFAULT_FEISHU_KEYWORD = "hope"
 
 
@@ -37,9 +36,7 @@ def send_feishu_text(text: str, *, require_url: bool = False) -> str:
     if not url:
         if require_url:
             raise RuntimeError(
-                "FEISHU_WEBHOOK_URL unset. "
-                "fly secrets set FEISHU_WEBHOOK_URL='https://open.feishu.cn/open-apis/bot/v2/hook/...' "
-                "-a hope-metrics-airflow"
+                "FEISHU_WEBHOOK_URL unset. Set it in GitHub Actions secrets or local .env."
             )
         logger.info("FEISHU_WEBHOOK_URL unset; alert body:\n%s", text)
         return "logged"

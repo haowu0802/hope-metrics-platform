@@ -8,6 +8,7 @@ Transforms (`stg` / `mart`). Ingest owns `raw_*`.
 |---|---|
 | `dbt_project.yml` | Project and default materializations |
 | `profiles.example.yml` | Copy to `~/.dbt/profiles.yml` |
+| `scripts/write_profiles_from_env.py` | CI: `DATABASE_URL` → profiles.yml |
 | `packages.yml` | `dbt_utils` |
 | `models/staging/` | Sources + dedupe |
 | `models/marts/` | Daily usage grain |
@@ -33,4 +34,4 @@ Seed: `seeds/device_registry.csv` — labels only; never deletes warehouse rows.
 
 Tests cover unique grains, `not_null`, and non-negative minutes.
 
-After model changes used by Airflow, **deploy Fly Airflow** so the image picks up `dbt/` (`bash airflow/deploy.sh`).
+After model changes: push to GitHub (dbt + Feishu jobs run on Actions). See `jobs/feishu/README.md`.
