@@ -1,7 +1,7 @@
 # ingest
 
 `POST /v1/events` appends to `raw_device_usage_hour`.  
-`GET /` is a thin status page (KPIs + links to Metabase / Airflow). Charts live in Metabase. Health: `GET /health`.
+`GET /` is a thin status page (KPIs + link to Metabase). Charts live in Metabase. Health: `GET /health`.
 
 Optional UI lang: `/?lang=zh`.
 

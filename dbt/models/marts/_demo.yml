@@ -52,7 +52,7 @@ models:
         tests: [not_null]
 
   - name: mart_device_staleness_demo
-    description: Unused-device flags for demo cohort / Airflow alerts.
+    description: Unused-device flags for demo cohort / Feishu alerts.
     columns:
       - name: device_id
         tests: [unique, not_null]

@@ -5,10 +5,10 @@ Measures donated-device active use for a GenAI education pilot.
 ## Repo layout
 
 - `probe/` — Windows agent (active minutes per hour)
-- `ingest/` — HTTP ingest + status page (links to Metabase / Airflow)
+- `ingest/` — HTTP ingest + status page (links to Metabase)
 - `warehouse/` — legacy SQL (reference only)
 - `dbt/` — stg/mart transforms and tests
-- `airflow/` — schedules `dbt build` (local Compose or Fly `hope-metrics-airflow`)
+- `jobs/feishu/` — Feishu alerts/digests on GitHub Actions (with daily `dbt build`)
 - `metabase/` — BI on marts (local Compose or Fly `hope-metrics-metabase`)
 
 See `docs/device-event-contract.md`, `docs/grains.md`, `docs/deploy-checklist.md`.

@@ -1,0 +1,97 @@
+# Daily dbt build + Feishu alerts/digests (replaces Fly Airflow).
+# Secrets: DATABASE_URL (required), FEISHU_WEBHOOK_URL + FEISHU_KEYWORD (optional).
+
+name: dbt daily
+
+on:
+  schedule:
+    - cron: "0 12 * * *"
+  workflow_dispatch:
+    inputs:
+      weekly:
+        description: Also send weekly digest
+        type: boolean
+        default: false
+      monthly:
+        description: Also send monthly digest
+        type: boolean
+        default: false
+
+concurrency:
+  group: dbt-daily
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            dbt/requirements.txt
+            jobs/feishu/requirements.txt
+
+      - name: Install dbt + Feishu jobs
+        run: |
+          pip install -r dbt/requirements.txt
+          pip install -r jobs/feishu/requirements.txt
+
+      - name: Write profiles.yml
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python dbt/scripts/write_profiles_from_env.py
+
+      - name: dbt build
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          cd dbt
+          dbt deps
+          dbt build
+
+      - name: UTC calendar
+        id: cal
+        run: |
+          echo "dow=$(date -u +%u)" >> "$GITHUB_OUTPUT"
+          echo "dom=$(date -u +%d)" >> "$GITHUB_OUTPUT"
+
+      - name: Feishu alerts + daily digest
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
+          FEISHU_KEYWORD: ${{ secrets.FEISHU_KEYWORD }}
+        run: |
+          python -m jobs.feishu alerts
+          python -m jobs.feishu daily
+
+      - name: Weekly digest
+        if: >-
+          (github.event_name == 'schedule' && steps.cal.outputs.dow == '1') ||
+          (github.event_name == 'workflow_dispatch' && github.event.inputs.weekly == 'true')
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
+          FEISHU_KEYWORD: ${{ secrets.FEISHU_KEYWORD }}
+        run: python -m jobs.feishu weekly
+
+      - name: Monthly digest
+        if: >-
+          (github.event_name == 'schedule' && steps.cal.outputs.dom == '01') ||
+          (github.event_name == 'workflow_dispatch' && github.event.inputs.monthly == 'true')
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
+          FEISHU_KEYWORD: ${{ secrets.FEISHU_KEYWORD }}
+        run: python -m jobs.feishu monthly
+
+      - name: Feishu on failure
+        if: failure()
+        env:
+          FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
+          FEISHU_KEYWORD: ${{ secrets.FEISHU_KEYWORD }}
+        run: python -m jobs.feishu fail --subject "dbt 日批或飞书任务失败 (GitHub Actions)"

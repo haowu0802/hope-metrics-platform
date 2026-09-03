@@ -35,4 +35,4 @@ Twin marts share the same metrics; only calendar day and hour-of-day differ.
 
 ## `mart_device_staleness`
 
-One row per device (from China summary): `days_since_seen`, `is_stale` (default ≥ 2 China calendar days). Used by Airflow `hope_device_alerts`.
+One row per device (from China summary): `days_since_seen`, `is_stale` (default ≥ 2 China calendar days). Used by GitHub Actions `python -m jobs.feishu alerts`.

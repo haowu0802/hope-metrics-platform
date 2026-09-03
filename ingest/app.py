@@ -74,7 +74,6 @@ def status_page(request: Request, lang: str | None = None) -> HTMLResponse:
             "t": messages_for(locale),
             "lang_en_href": "/" + build_query(lang="en"),
             "lang_zh_href": "/" + build_query(lang="zh"),
-            "airflow_url": os.environ.get("AIRFLOW_URL", "").strip() or None,
             "metabase_url": os.environ.get("METABASE_URL", "").strip() or None,
         },
     )

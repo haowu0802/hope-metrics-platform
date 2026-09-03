@@ -3,13 +3,9 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 
-from airflow import DAG
-from airflow.operators.python import PythonOperator
-
-from hope_feishu import send_feishu_text
-from hope_report_common import (
+from jobs.feishu.common import (
     cohort_counts,
     connect_fn,
     dashboard_footer_lines,
@@ -21,6 +17,7 @@ from hope_report_common import (
     stale_device_days,
     today_cn,
 )
+from jobs.feishu.webhook import send_feishu_text
 
 logger = logging.getLogger(__name__)
 
@@ -230,35 +227,4 @@ def send_daily_metabase_report() -> None:
         minutes_yday,
         active_devices_yday,
         devices,
-    )
-
-
-def _feishu_on_failure(context) -> None:
-    ti = context.get("task_instance")
-    text = (
-        "【Hope Metrics】每日飞书简报任务失败\n"
-        f"task={getattr(ti, 'task_id', '?')} run={context.get('run_id', '?')}"
-    )
-    try:
-        send_feishu_text(text)
-    except Exception:
-        logger.exception("Feishu failure callback failed")
-
-
-with DAG(
-    dag_id="hope_daily_feishu_report",
-    description="Daily Feishu digest + Metabase public dashboard link",
-    schedule="45 12 * * *",  # after dbt (12:00) and alerts (12:30)
-    start_date=datetime(2026, 8, 1, tzinfo=timezone.utc),
-    catchup=False,
-    max_active_runs=1,
-    tags=["hope", "feishu", "metabase", "report"],
-    default_args={
-        "retries": 1,
-        "on_failure_callback": _feishu_on_failure,
-    },
-) as dag:
-    PythonOperator(
-        task_id="send_daily_metabase_report",
-        python_callable=send_daily_metabase_report,
     )
